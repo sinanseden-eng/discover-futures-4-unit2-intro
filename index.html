@@ -3,546 +3,418 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit 2: What is the value of money?</title>
-    
+    <title>Unit 2: What is the value of MONEY?</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Inter:wght@300;400;600&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #020617; /* Slate 950 */
-            color: #f8fafc; 
-            overflow-x: hidden;
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        h1, h2, h3, .font-display { font-family: 'Montserrat', sans-serif; }
-
-        .fade-in { animation: fadeIn 0.8s ease-in-out forwards; }
-        .slide-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(30px); }
-        .delay-1 { animation-delay: 0.15s; }
-        .delay-2 { animation-delay: 0.3s; }
-        .delay-3 { animation-delay: 0.45s; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-
-        /* Floating Money Background Effect */
-        .money-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.05;
-        }
-
-        .coin {
-            position: absolute;
-            color: #fbbf24; /* Amber 400 */
-            font-size: 2rem;
-            animation: float-up linear infinite;
-        }
-
-        @keyframes float-up {
-            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-        }
-
-        .glow-text { text-shadow: 0 0 15px rgba(52, 211, 153, 0.5); }
-        .glow-box { box-shadow: 0 0 30px rgba(52, 211, 153, 0.2); }
-
-        .theme-bg {
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.95)), url('https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1920&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .text-glow { text-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+        canvas { touch-action: none; }
+        .scratch-container { position: relative; width: 300px; height: 300px; margin: 0 auto; border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 2px solid #10b981; }
+        .scratch-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        .scratch-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; cursor: pointer; }
     </style>
 </head>
-<body class="theme-bg">
-    <div class="money-bg" id="money-bg">
-        <!-- Coins injected via JS -->
+<body class="bg-slate-900 text-white min-h-screen flex flex-col">
+
+    <!-- Theme Background -->
+    <div class="fixed inset-0 z-[-1]">
+        <div class="absolute inset-0 bg-slate-900/85 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover" alt="Finance Background">
     </div>
-    
-    <div id="root" class="relative z-10 min-h-screen"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+    <!-- Main Container -->
+    <div class="max-w-6xl mx-auto w-full p-6 flex-grow flex flex-col relative z-20">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h2 class="text-emerald-400 font-bold tracking-wider uppercase text-sm mb-2"><i class="fas fa-coins mr-2"></i>Unit 2 Interactive Intro</h2>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 text-glow">What is the value of <span class="text-emerald-500">MONEY?</span></h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">Explore the history of currency, the psychology of value, and how trends shape our world.</p>
+        </header>
 
-        const BackgroundCoins = () => {
-            useEffect(() => {
-                const container = document.getElementById('money-bg');
-                if(!container) return;
-                const symbols = ['fa-coins', 'fa-dollar-sign', 'fa-euro-sign', 'fa-pound-sign', 'fa-yen-sign'];
+        <!-- Navigation Tabs -->
+        <nav class="flex flex-wrap justify-center gap-4 mb-8">
+            <button onclick="showPhase(1)" id="btn-phase-1" class="phase-btn active px-6 py-3 rounded-full font-bold transition-all duration-300 bg-emerald-600 text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]"><i class="fas fa-question-circle mr-2"></i>1. Money Trivia</button>
+            <button onclick="showPhase(2)" id="btn-phase-2" class="phase-btn px-6 py-3 rounded-full font-bold transition-all duration-300 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"><i class="fas fa-gem mr-2"></i>2. Trash or Treasure?</button>
+            <button onclick="showPhase(3)" id="btn-phase-3" class="phase-btn px-6 py-3 rounded-full font-bold transition-all duration-300 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"><i class="fas fa-play-circle mr-2"></i>3. Factflix Video</button>
+            <button onclick="showPhase(4)" id="btn-phase-4" class="phase-btn px-6 py-3 rounded-full font-bold transition-all duration-300 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700"><i class="fas fa-handshake mr-2"></i>4. Barter Hustle</button>
+        </nav>
+
+        <!-- Phase 1: Money Trivia -->
+        <div id="phase-1" class="phase-content glass-panel rounded-2xl p-8 max-w-4xl mx-auto w-full">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-white mb-2">Money Trivia</h3>
+                <p class="text-slate-400">Can you guess the right answers before we start the unit?</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Question 1 -->
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <p class="text-xl font-semibold mb-4">1. What are U.S. paper bills mostly made of?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button onclick="checkTrivia(1, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) Paper from trees</button>
+                        <button onclick="checkTrivia(1, true, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) Cotton & Linen</button>
+                        <button onclick="checkTrivia(1, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">C) Synthetic Plastic</button>
+                    </div>
+                    <div id="trivia-fact-1" class="hidden mt-4 p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg text-emerald-300">
+                        <i class="fas fa-info-circle mr-2"></i><strong>Correct!</strong> U.S. currency is actually a blend of 75% cotton and 25% linen. That's why it survives going through the washing machine!
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <p class="text-xl font-semibold mb-4">2. Who prints more money annually?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button onclick="checkTrivia(2, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) The United States Mint</button>
+                        <button onclick="checkTrivia(2, true, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) The makers of Monopoly</button>
+                    </div>
+                    <div id="trivia-fact-2" class="hidden mt-4 p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg text-emerald-300">
+                        <i class="fas fa-info-circle mr-2"></i><strong>Correct!</strong> Parker Brothers prints about $30 billion in Monopoly money every year, which is way more than the US Mint prints in real money.
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                    <p class="text-xl font-semibold mb-4">3. Where was paper money first invented?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button onclick="checkTrivia(3, true, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) China</button>
+                        <button onclick="checkTrivia(3, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) Ancient Greece</button>
+                        <button onclick="checkTrivia(3, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">C) The Roman Empire</button>
+                    </div>
+                    <div id="trivia-fact-3" class="hidden mt-4 p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg text-emerald-300">
+                        <i class="fas fa-info-circle mr-2"></i><strong>Correct!</strong> The first paper money was created in China during the Tang Dynasty (7th century) because heavy copper coins were too difficult for merchants to carry.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Trash or Treasure -->
+        <div id="phase-2" class="phase-content hidden glass-panel rounded-2xl p-8 w-full">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-white mb-2">Trash or Treasure?</h3>
+                <p class="text-slate-400">One of these items sold for <strong class="text-emerald-400">$10,000</strong>. The other sold for <strong class="text-emerald-400">$200</strong>.<br>Scratch to reveal the items and guess their subjective value!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+                <!-- Item A -->
+                <div class="text-center">
+                    <h4 class="text-xl font-bold text-amber-400 mb-4">Item A</h4>
+                    <div class="scratch-container" id="container-a">
+                        <img src="https://images.unsplash.com/photo-1472457897821-70d3819a0e24?q=80&w=640&auto=format&fit=crop" class="scratch-image" alt="Red Darth Vader Head Alternative">
+                        <canvas id="canvas-a" class="scratch-canvas"></canvas>
+                    </div>
+                    <p class="mt-4 text-slate-300 font-medium">A rare red plastic toy head piece.</p>
+                </div>
+
+                <!-- Item B -->
+                <div class="text-center">
+                    <h4 class="text-xl font-bold text-amber-400 mb-4">Item B</h4>
+                    <div class="scratch-container" id="container-b">
+                        <img src="https://chairish-prod.freetls.fastly.net/image/product/sized/32ea28c7-73c5-4c5e-b0a5-04962c4113f1/vintage-brown-and-tan-americana-crockery-vessel-or-cookie-jar-8665?aspect=fit&width=640&height=640" class="scratch-image" alt="Vintage Cookie Jar">
+                        <canvas id="canvas-b" class="scratch-canvas"></canvas>
+                    </div>
+                    <p class="mt-4 text-slate-300 font-medium">A vintage ceramic cookie jar once owned by artist Andy Warhol.</p>
+                </div>
+            </div>
+            
+            <div class="mt-10 text-center">
+                <button onclick="alert('Item A (the plastic red Darth Vader head) sold for up to $10,000 to collectors! \n\nItem B (Andy Warhol\'s vintage cookie jar) dropped in value and sells for only $200 today! \n\nValue is subjective!')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition">Reveal the Answer</button>
+            </div>
+        </div>
+
+        <!-- Phase 3: Video Discussion -->
+        <div id="phase-3" class="phase-content hidden glass-panel rounded-2xl p-8 max-w-4xl mx-auto w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h3 class="text-3xl font-bold text-emerald-400 mb-4">Why does money exist?</h3>
+                    <p class="text-slate-300 mb-6 text-lg leading-relaxed">Before we watch the Factflix video with Ryan and Ava, let's discuss how money shapes our daily transactions.</p>
+                    
+                    <div class="bg-slate-800/80 p-5 rounded-xl border-l-4 border-amber-400 mb-6">
+                        <h4 class="font-bold text-amber-400 mb-3 uppercase tracking-wider text-sm">Key Phrases: Talking about money</h4>
+                        <ul class="space-y-2 text-slate-300 font-medium">
+                            <li><i class="fas fa-comment-dots text-emerald-500 mr-2"></i> "It makes things a lot easier / more..."</li>
+                            <li><i class="fas fa-comment-dots text-emerald-500 mr-2"></i> "You just have to..."</li>
+                            <li><i class="fas fa-comment-dots text-emerald-500 mr-2"></i> "It may (not) be worth... in a few years."</li>
+                            <li><i class="fas fa-comment-dots text-emerald-500 mr-2"></i> "...has the advantage of being..."</li>
+                            <li><i class="fas fa-comment-dots text-emerald-500 mr-2"></i> "But what would happen if...?"</li>
+                        </ul>
+                    </div>
+                </div>
                 
-                for(let i = 0; i < 20; i++) {
-                    const coin = document.createElement('i');
-                    coin.className = `fas ${symbols[Math.floor(Math.random() * symbols.length)]} coin`;
-                    coin.style.left = `${Math.random() * 100}vw`;
-                    coin.style.animationDuration = `${Math.random() * 15 + 10}s`;
-                    coin.style.animationDelay = `${Math.random() * 5}s`;
-                    coin.style.fontSize = `${Math.random() * 2 + 1}rem`;
-                    container.appendChild(coin);
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                    <h4 class="text-xl font-bold text-white mb-4 text-center border-b border-slate-700 pb-3">Pre-Watch Discussion</h4>
+                    <p class="text-slate-300 mb-4 font-medium text-center">Do you agree with these statements?</p>
+                    <ol class="space-y-4 text-slate-400 list-decimal list-inside">
+                        <li class="pl-2">If you don't have money, you can negotiate deals by <span class="text-emerald-400 font-bold">bartering</span>.</li>
+                        <li class="pl-2"><span class="text-emerald-400 font-bold">Swapping</span> goods is more convenient than using money.</li>
+                        <li class="pl-2">In the USA, more than half of <span class="text-emerald-400 font-bold">transactions</span> are made by cell phone.</li>
+                        <li class="pl-2">Some <span class="text-emerald-400 font-bold">consumers</span> can pay for things just by using their hand.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 4: The Great Barter Hustle -->
+        <div id="phase-4" class="phase-content hidden glass-panel rounded-2xl p-8 w-full max-w-5xl mx-auto">
+            <div class="text-center mb-8">
+                <h3 class="text-3xl font-bold text-emerald-400 mb-2">The Great Barter Hustle</h3>
+                <p class="text-slate-300 text-lg">Use your target vocabulary to trade your way to the top!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Instructions -->
+                <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-700">
+                    <h4 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-clipboard-list text-emerald-400 mr-3"></i> Instructions</h4>
+                    
+                    <!-- CORRECTED HTML STRUCTURE FOR INSTRUCTIONS -->
+                    <ul class="space-y-4 text-slate-300 text-lg">
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 font-bold mr-3 shrink-0">1.</span>
+                            <p class="leading-relaxed">Get a card from your teacher. It will show something you <span class="text-emerald-400 font-bold">HAVE</span> or something you <span class="text-amber-400 font-bold">WANT</span>.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 font-bold mr-3 shrink-0">2.</span>
+                            <p class="leading-relaxed">Walk around the classroom and find a partner.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 font-bold mr-3 shrink-0">3.</span>
+                            <p class="leading-relaxed">Negotiate a trade! You <span class="underline font-bold text-white">must</span> use the target vocabulary to make the deal.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-400 font-bold mr-3 shrink-0">4.</span>
+                            <p class="leading-relaxed">Once you agree, exchange cards and sit down.</p>
+                        </li>
+                    </ul>
+
+                    <div class="mt-6 p-4 bg-slate-900 rounded-lg border border-slate-700">
+                        <p class="text-sm text-slate-400 uppercase tracking-wider mb-2 font-bold">Target Vocabulary:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-emerald-900/50 text-emerald-300 px-3 py-1 rounded-full text-sm border border-emerald-800">barter</span>
+                            <span class="bg-emerald-900/50 text-emerald-300 px-3 py-1 rounded-full text-sm border border-emerald-800">swap</span>
+                            <span class="bg-emerald-900/50 text-emerald-300 px-3 py-1 rounded-full text-sm border border-emerald-800">negotiate</span>
+                            <span class="bg-emerald-900/50 text-emerald-300 px-3 py-1 rounded-full text-sm border border-emerald-800">transaction</span>
+                            <span class="bg-emerald-900/50 text-emerald-300 px-3 py-1 rounded-full text-sm border border-emerald-800">deal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="bg-slate-900 p-8 rounded-xl border border-emerald-800/50 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.15)] relative overflow-hidden">
+                    <div class="absolute top-0 w-full h-1 bg-slate-800">
+                        <div id="timer-bar" class="h-full bg-emerald-500 w-full transition-all duration-1000 linear"></div>
+                    </div>
+                    
+                    <h4 class="text-emerald-500 font-bold tracking-widest uppercase mb-4">Market Closes In</h4>
+                    <div id="timer-display" class="text-7xl md:text-8xl font-black text-white font-mono tracking-tight mb-8 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                        3:00
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button id="btn-timer-start" onclick="startTimer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition flex items-center">
+                            <i class="fas fa-play mr-2"></i> Start Hustle
+                        </button>
+                        <button onclick="resetTimer()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold w-12 h-12 rounded-full shadow-lg transition flex items-center justify-center">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Phase Navigation Logic
+        function showPhase(phaseNum) {
+            document.querySelectorAll('.phase-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('phase-' + phaseNum).classList.remove('hidden');
+            
+            document.querySelectorAll('.phase-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-600', 'text-white', 'shadow-[0_0_15px_rgba(16,185,129,0.4)]');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+            
+            const activeBtn = document.getElementById('btn-phase-' + phaseNum);
+            activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+            activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-[0_0_15px_rgba(16,185,129,0.4)]');
+
+            if(phaseNum === 2) {
+                initScratchCards();
+            }
+        }
+
+        // Trivia Logic
+        function checkTrivia(qNum, isCorrect, btnElement) {
+            const siblings = btnElement.parentElement.children;
+            for(let i=0; i<siblings.length; i++) {
+                siblings[i].disabled = true;
+                siblings[i].classList.remove('bg-slate-700', 'hover:bg-slate-600');
+                siblings[i].classList.add('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
+            }
+            
+            if(isCorrect) {
+                btnElement.classList.remove('bg-slate-800', 'text-slate-500');
+                btnElement.classList.add('bg-emerald-600', 'text-white', 'border-2', 'border-emerald-400');
+                document.getElementById('trivia-fact-' + qNum).classList.remove('hidden');
+            } else {
+                btnElement.classList.remove('bg-slate-800', 'text-slate-500');
+                btnElement.classList.add('bg-red-600', 'text-white');
+                
+                // Highlight correct answer
+                for(let i=0; i<siblings.length; i++) {
+                    if(siblings[i].getAttribute('onclick').includes('true')) {
+                        siblings[i].classList.remove('bg-slate-800', 'text-slate-500');
+                        siblings[i].classList.add('bg-emerald-600', 'text-white');
+                    }
                 }
-            }, []);
-            return null;
-        };
+                document.getElementById('trivia-fact-' + qNum).classList.remove('hidden');
+            }
+        }
 
-        const ScratchItemCard = ({ title, desc, imageUrl, price, tag, isRevealed, onReveal }) => {
-            const canvasRef = useRef(null);
-            const [isDrawing, setIsDrawing] = useState(false);
+        // Scratch Card Logic
+        let cardsInitialized = false;
+        function initScratchCards() {
+            if(cardsInitialized) return;
+            setupScratchCanvas('canvas-a');
+            setupScratchCanvas('canvas-b');
+            cardsInitialized = true;
+        }
 
-            useEffect(() => {
-                const canvas = canvasRef.current;
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                
-                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                gradient.addColorStop(0, '#047857'); // Emerald 700
-                gradient.addColorStop(1, '#0f766e'); // Teal 700
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function setupScratchCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.font = 'bold 20px Montserrat';
-                ctx.textAlign = 'center';
-                ctx.fillText('SCRATCH TO REVEAL', canvas.width / 2, canvas.height / 2 + 7);
-            }, []);
+            // Set canvas resolution to match container
+            canvas.width = 300;
+            canvas.height = 300;
 
-            const startDrawing = (e) => {
-                if (isRevealed) return;
-                setIsDrawing(true);
-                scratch(e);
-            };
+            // Fill with solid color and text
+            ctx.fillStyle = '#0f766e'; // Emerald-700
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add scratch pattern
+            ctx.fillStyle = '#047857'; // Emerald-800
+            for(let i=0; i<100; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 20, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
-            const stopDrawing = () => {
-                setIsDrawing(false);
-            };
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('SCRATCH HERE', canvas.width/2, canvas.height/2);
 
-            const scratch = (e) => {
-                if (!isDrawing || isRevealed) return;
-                const canvas = canvasRef.current;
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
+            function getMousePos(e) {
                 const rect = canvas.getBoundingClientRect();
-                
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
 
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-
-                const x = (clientX - rect.left) * scaleX;
-                const y = (clientY - rect.top) * scaleY;
-
+            function scratch(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+                const pos = getMousePos(e);
                 ctx.globalCompositeOperation = 'destination-out';
                 ctx.beginPath();
-                ctx.arc(x, y, 30, 0, Math.PI * 2);
+                ctx.arc(pos.x, pos.y, 25, 0, Math.PI * 2);
                 ctx.fill();
-            };
-
-            return (
-                <div className="relative rounded-3xl p-6 md:p-8 border-2 border-slate-700 bg-slate-900/90 shadow-2xl flex flex-col items-center text-center overflow-hidden">
-                    <div className="relative w-48 h-48 rounded-2xl overflow-hidden mb-6 shadow-inner border-2 border-slate-700 bg-slate-950 flex items-center justify-center">
-                        {/* Hidden Content */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-                            <img 
-                                src={imageUrl} 
-                                alt={title}
-                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/200x200/1e293b/34d399?text=Item'; }}
-                                className="w-28 h-28 object-contain mb-2 drop-shadow-lg"
-                            />
-                            <div className="text-2xl font-black text-emerald-400">{price}</div>
-                        </div>
-
-                        {/* Scratchable Layer */}
-                        <canvas 
-                            ref={canvasRef}
-                            width={300}
-                            height={300}
-                            className={`absolute inset-0 w-full h-full cursor-crosshair transition-opacity duration-700 ${isRevealed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-                            onMouseDown={startDrawing}
-                            onMouseUp={stopDrawing}
-                            onMouseLeave={stopDrawing}
-                            onMouseMove={scratch}
-                            onTouchStart={startDrawing}
-                            onTouchEnd={stopDrawing}
-                            onTouchMove={scratch}
-                        />
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-white mb-2">{title}</h3>
-                    <p className="text-slate-400 text-sm mb-6 leading-relaxed">{desc}</p>
-
-                    {isRevealed && (
-                        <div className="animate-fade-in w-full mt-auto">
-                            <p className="text-sm text-emerald-200 bg-emerald-950/80 p-3 rounded-xl border border-emerald-500/30">
-                                {tag}
-                            </p>
-                        </div>
-                    )}
-
-                    {!isRevealed && (
-                        <button 
-                            onClick={onReveal}
-                            className="mt-auto text-xs font-bold uppercase tracking-widest text-emerald-400 hover:text-white underline transition-colors"
-                        >
-                            Auto-Reveal Item
-                        </button>
-                    )}
-                </div>
-            );
-        };
-
-        const App = () => {
-            const [stage, setStage] = useState(0); 
-            const [revealed, setRevealed] = useState(false);
-            const [barterAnswers, setBarterAnswers] = useState({});
-            const [triviaAnswers, setTriviaAnswers] = useState({});
-
-            const nextStage = () => {
-                setStage(stage + 1);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            };
-
-            if (stage === 0) {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <BackgroundCoins />
-                        <div className="max-w-4xl mx-auto fade-in">
-                            <div className="mb-6 inline-block">
-                                <i className="fas fa-wallet text-6xl text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-600"></i>
-                            </div>
-                            <h3 className="text-sm font-bold tracking-[0.3em] uppercase text-emerald-500 mb-4">Unit 2 Introduction</h3>
-                            <h1 className="font-display text-5xl md:text-8xl font-black mb-6 text-white leading-tight">
-                                What is the value of <br/>
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 glow-text">MONEY?</span>
-                            </h1>
-                            <p className="text-xl md:text-2xl text-slate-300 mb-12 font-light max-w-2xl mx-auto leading-relaxed">
-                                Before we open the book, let's test your instincts about wealth, trade, and the bizarre things humans choose to value.
-                            </p>
-                            <button 
-                                onClick={nextStage}
-                                className="group relative inline-flex items-center justify-center px-10 py-5 font-bold text-white transition-all duration-300 bg-slate-900 border-2 border-emerald-500 rounded-full hover:bg-emerald-600 focus:outline-none shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:shadow-[0_0_40px_rgba(52,211,153,0.6)] hover:-translate-y-1"
-                            >
-                                <span className="mr-3 text-lg tracking-wider font-display uppercase">Start the Simulation</span>
-                                <i className="fas fa-arrow-right transform group-hover:translate-x-2 transition-transform text-emerald-400 group-hover:text-white"></i>
-                            </button>
-                        </div>
-                    </div>
-                );
             }
 
-            if (stage === 1) {
-                const handleTrivia = (qId, idx) => {
-                    if (triviaAnswers[qId] !== undefined) return;
-                    setTriviaAnswers({...triviaAnswers, [qId]: idx});
-                };
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('mouseup', () => isDrawing = false);
+            canvas.addEventListener('mouseleave', () => isDrawing = false);
 
-                const triviaQuestions = [
-                    { id: 1, q: "What is US 'paper' money actually made of?", opts: ["Tree wood", "Cotton and linen", "Recycled plastic"], ans: 1, fact: "Surprise! US bills are 75% cotton and 25% linen. That's why they don't easily fall apart in the washing machine!" },
-                    { id: 2, q: "Which of these is printed MORE every year?", opts: ["Monopoly game money", "Real US Dollars", "Euro Banknotes"], ans: 0, fact: "Parker Brothers prints about $30 billion in Monopoly money each year, far more than the US mint prints in real currency!" },
-                    { id: 3, q: "Where was the very first paper money invented?", opts: ["Ancient Egypt", "The Roman Empire", "China"], ans: 2, fact: "Paper money was first developed in China during the Tang Dynasty (around 740 AD) to avoid carrying heavy metal coins." }
-                ];
+            canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive: false});
+            canvas.addEventListener('touchmove', scratch, {passive: false});
+            canvas.addEventListener('touchend', () => isDrawing = false);
+        }
 
-                return (
-                    <div className="min-h-screen p-6 md:p-12 pb-24 flex flex-col justify-center">
-                        <div className="max-w-6xl mx-auto w-full fade-in">
-                            <header className="text-center mb-12 border-b border-slate-800 pb-8">
-                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-3">Phase 1: Money Trivia</h4>
-                                <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">Fact or Fiction?</h2>
-                                <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-                                    Before we talk about the value of money, let's see how much you actually know about it! Guess the answers below.
-                                </p>
-                            </header>
+        // Timer Logic
+        let timerInterval;
+        let timeLeft = 180; // 3 minutes in seconds
+        const initialTime = 180;
 
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-up">
-                                {triviaQuestions.map((q) => (
-                                    <div key={q.id} className="bg-slate-900/90 border border-slate-700 p-6 rounded-3xl shadow-xl flex flex-col hover:border-emerald-500/30 transition-colors">
-                                        <div className="w-12 h-12 bg-emerald-900/50 rounded-full flex items-center justify-center mb-4 text-emerald-400 text-xl border border-emerald-500/30">
-                                            <i className="fas fa-question"></i>
-                                        </div>
-                                        <p className="text-lg text-white font-medium mb-6 flex-grow">{q.q}</p>
-                                        <div className="space-y-3 mb-6">
-                                            {q.opts.map((opt, optIdx) => {
-                                                const isSelected = triviaAnswers[q.id] === optIdx;
-                                                const isAnswered = triviaAnswers[q.id] !== undefined;
-                                                const isCorrect = optIdx === q.ans;
-                                                
-                                                let btnClass = "w-full text-left p-4 rounded-xl font-bold border transition-all text-sm ";
-                                                
-                                                if (!isAnswered) {
-                                                    btnClass += "bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-emerald-500/50";
-                                                } else {
-                                                    if (isCorrect) btnClass += "bg-emerald-600 border-emerald-400 text-white shadow-[0_0_15px_rgba(52,211,153,0.3)]";
-                                                    else if (isSelected) btnClass += "bg-red-900/50 border-red-500 text-red-200 opacity-70";
-                                                    else btnClass += "bg-slate-800 border-slate-700 text-slate-500 opacity-50";
-                                                }
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            if (seconds < 10) seconds = "0" + seconds;
+            document.getElementById('timer-display').innerText = `${minutes}:${seconds}`;
+            
+            // Update progress bar
+            const percentage = (timeLeft / initialTime) * 100;
+            document.getElementById('timer-bar').style.width = percentage + '%';
 
-                                                return (
-                                                    <button 
-                                                        key={optIdx}
-                                                        onClick={() => handleTrivia(q.id, optIdx)}
-                                                        disabled={isAnswered}
-                                                        className={btnClass}
-                                                    >
-                                                        {opt}
-                                                        {isAnswered && isCorrect && <i className="fas fa-check float-right mt-1 text-emerald-200"></i>}
-                                                        {isAnswered && isSelected && !isCorrect && <i className="fas fa-times float-right mt-1 text-red-300"></i>}
-                                                    </button>
-                                                )
-                                            })}
-                                        </div>
-                                        
-                                        {triviaAnswers[q.id] !== undefined && (
-                                            <div className="mt-auto animate-fade-in bg-slate-950 p-4 rounded-xl border-l-4 border-emerald-500">
-                                                <p className="text-sm text-slate-300"><span className="text-emerald-400 font-bold">Fun Fact:</span> {q.fact}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-12 text-center slide-up delay-2">
-                                <button 
-                                    onClick={nextStage}
-                                    disabled={Object.keys(triviaAnswers).length < 3}
-                                    className={`px-12 py-4 rounded-full font-bold text-lg transition-all transform ${
-                                        Object.keys(triviaAnswers).length === 3
-                                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] hover:scale-105'
-                                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                                    }`}
-                                >
-                                    Continue to Phase 2 <i className="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
+            // Change colors when time is running out
+            if (timeLeft <= 30) {
+                document.getElementById('timer-display').classList.add('text-red-500');
+                document.getElementById('timer-display').classList.remove('text-white');
+                document.getElementById('timer-bar').classList.add('bg-red-500');
+                document.getElementById('timer-bar').classList.remove('bg-emerald-500');
+            } else {
+                document.getElementById('timer-display').classList.remove('text-red-500');
+                document.getElementById('timer-display').classList.add('text-white');
+                document.getElementById('timer-bar').classList.remove('bg-red-500');
+                document.getElementById('timer-bar').classList.add('bg-emerald-500');
             }
+        }
 
-            if (stage === 2) {
-                return (
-                    <div className="min-h-screen p-6 md:p-12 pb-24 flex items-center justify-center">
-                        <div className="max-w-5xl mx-auto w-full fade-in">
-                            <header className="text-center mb-12 border-b border-slate-800 pb-8">
-                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-3">Phase 2: The Value Test</h4>
-                                <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">Trash or Treasure?</h2>
-                                <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-                                    Scratch off the protective coating below to uncover the true auction prices of these unique collectibles!
-                                </p>
-                            </header>
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            const btn = document.getElementById('btn-timer-start');
+            btn.innerHTML = '<i class="fas fa-pause mr-2"></i> Pause Hustle';
+            btn.classList.add('bg-amber-600', 'hover:bg-amber-500');
+            btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+            btn.onclick = pauseTimer;
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 slide-up">
-                                <ScratchItemCard 
-                                    title="Item A: Prototype Figurine"
-                                    desc="A rare test piece molded in red plastic, never sold in retail stores. Cost to manufacture: $0.05."
-                                    imageUrl="https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=400&auto=format&fit=crop"
-                                    price="$10,000+"
-                                    tag="TREASURE! High collector demand makes this tiny piece exceptionally valuable."
-                                    isRevealed={revealed}
-                                    onReveal={() => setRevealed(true)}
-                                />
-
-                                <ScratchItemCard 
-                                    title="Item B: Vintage Ceramic Cookie Jar"
-                                    desc="A decorative kitchen jar owned and collected by renowned pop artist Andy Warhol in the 1980s."
-                                    imageUrl="https://chairish-prod.freetls.fastly.net/image/product/sized/32ea28c7-73c5-4c5e-b0a5-04962c4113f1/vintage-brown-and-tan-americana-crockery-vessel-or-cookie-jar-8665?aspect=fit&width=640&height=640"
-                                    price="$200"
-                                    tag="LOST VALUE! While once valued near $23,000, market tastes shifted significantly."
-                                    isRevealed={revealed}
-                                    onReveal={() => setRevealed(true)}
-                                />
-                            </div>
-
-                            <div className="mt-12 text-center slide-up delay-2">
-                                {!revealed ? (
-                                    <button 
-                                        onClick={() => setRevealed(true)}
-                                        className="px-12 py-4 rounded-full font-bold text-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(52,211,153,0.5)] transition-all"
-                                    >
-                                        Auto-Reveal All Prices
-                                    </button>
-                                ) : (
-                                    <div className="animate-fade-in">
-                                        <p className="text-xl text-white font-medium mb-6">
-                                            <i className="fas fa-info-circle text-emerald-400 mr-2"></i>
-                                            Lesson: <span className="italic">"One person's trash is another person's treasure."</span>
-                                        </p>
-                                        <button 
-                                            onClick={nextStage}
-                                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-12 py-4 rounded-full font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all transform hover:scale-105"
-                                        >
-                                            Continue to Phase 3 <i className="fas fa-arrow-right ml-2"></i>
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (stage === 3) {
-                const handleBarterClick = (q, answer) => {
-                    setBarterAnswers({...barterAnswers, [q]: answer});
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    alert("MARKET IS CLOSED! Sit down and let's review the trades!");
+                    pauseTimer();
                 }
+            }, 1000);
+        }
 
-                return (
-                    <div className="min-h-screen p-6 md:p-12 pb-24 flex items-center">
-                        <div className="max-w-6xl mx-auto w-full fade-in">
-                            <header className="mb-10 text-center">
-                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-2">Phase 3: Money Matters</h4>
-                                <h2 className="text-4xl font-display font-black text-white">Life Without Currency</h2>
-                                <p className="text-slate-300 mt-4 text-lg">If bills and coins disappeared, how would we survive? Choose the correct vocabulary word.</p>
-                            </header>
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            const btn = document.getElementById('btn-timer-start');
+            btn.innerHTML = '<i class="fas fa-play mr-2"></i> Resume Hustle';
+            btn.classList.remove('bg-amber-600', 'hover:bg-amber-500');
+            btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+            btn.onclick = startTimer;
+        }
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 slide-up">
-                                <div className="bg-slate-900/90 border border-slate-700 p-8 rounded-3xl shadow-xl hover:border-emerald-500/50 transition-all">
-                                    <div className="w-16 h-16 bg-blue-900/50 rounded-full flex items-center justify-center mb-6 text-blue-400 text-2xl border border-blue-500/30">
-                                        <i className="fas fa-balance-scale"></i>
-                                    </div>
-                                    <p className="text-xl text-white leading-relaxed mb-8">
-                                        You are a lawyer. You need your garden fixed. A gardener needs legal help. You decide to exchange one hour of legal work for one hour of gardening.
-                                        <br/><br/>
-                                        This system, where no money is used, is called:
-                                    </p>
-                                    <div className="flex flex-col gap-3">
-                                        {['a transaction', 'bartering', 'a currency'].map((opt) => (
-                                            <button 
-                                                key={opt}
-                                                onClick={() => handleBarterClick(1, opt)}
-                                                className={`p-4 rounded-xl font-bold border transition-all text-left ${
-                                                    barterAnswers[1] === opt && opt === 'bartering' ? 'bg-emerald-600 border-emerald-400 text-white' :
-                                                    barterAnswers[1] === opt ? 'bg-red-900/50 border-red-500 text-red-200' :
-                                                    'bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700'
-                                                }`}
-                                            >
-                                                {opt} {barterAnswers[1] === opt && opt === 'bartering' && <i className="fas fa-check float-right mt-1"></i>}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timeLeft = initialTime;
+            updateTimerDisplay();
+            const btn = document.getElementById('btn-timer-start');
+            btn.innerHTML = '<i class="fas fa-play mr-2"></i> Start Hustle';
+            btn.classList.remove('bg-amber-600', 'hover:bg-amber-500');
+            btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+            btn.onclick = startTimer;
+        }
 
-                                <div className="bg-slate-900/90 border border-slate-700 p-8 rounded-3xl shadow-xl hover:border-emerald-500/50 transition-all delay-1">
-                                    <div className="w-16 h-16 bg-purple-900/50 rounded-full flex items-center justify-center mb-6 text-purple-400 text-2xl border border-purple-500/30">
-                                        <i className="fas fa-comments-dollar"></i>
-                                    </div>
-                                    <p className="text-xl text-white leading-relaxed mb-8">
-                                        You are in the Grand Bazaar in Istanbul. The rugs do not have price tags. You want a lower price, so you discuss it with the seller until you both agree.
-                                        <br/><br/>
-                                        What are you doing to the price?
-                                    </p>
-                                    <div className="flex flex-col gap-3">
-                                        {['consuming', 'swapping', 'negotiating'].map((opt) => (
-                                            <button 
-                                                key={opt}
-                                                onClick={() => handleBarterClick(2, opt)}
-                                                className={`p-4 rounded-xl font-bold border transition-all text-left ${
-                                                    barterAnswers[2] === opt && opt === 'negotiating' ? 'bg-emerald-600 border-emerald-400 text-white' :
-                                                    barterAnswers[2] === opt ? 'bg-red-900/50 border-red-500 text-red-200' :
-                                                    'bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700'
-                                                }`}
-                                            >
-                                                {opt} {barterAnswers[2] === opt && opt === 'negotiating' && <i className="fas fa-check float-right mt-1"></i>}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-12 text-center slide-up delay-2">
-                                <button 
-                                    onClick={nextStage}
-                                    disabled={!barterAnswers[1] || !barterAnswers[2]}
-                                    className={`px-12 py-4 rounded-full font-bold text-lg transition-all transform ${
-                                        barterAnswers[1] && barterAnswers[2]
-                                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] hover:scale-105'
-                                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                                    }`}
-                                >
-                                    Continue to Phase 4 <i className="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (stage === 4) {
-                return (
-                    <div className="min-h-screen p-6 md:p-12 flex items-center">
-                        <div className="max-w-6xl mx-auto w-full fade-in">
-                            
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                                <div className="order-2 lg:order-1 slide-up">
-                                    <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800 bg-black aspect-video flex flex-col items-center justify-center group cursor-pointer">
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-900/40 to-blue-900/40 mix-blend-overlay"></div>
-                                        <i className="fas fa-play-circle text-7xl text-white opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"></i>
-                                        <p className="absolute bottom-6 left-6 font-display font-bold text-2xl z-10"><span className="text-red-500">FACT</span>FLIX: Why does money exist?</p>
-                                    </div>
-                                    
-                                    <div className="mt-8 bg-slate-900/90 p-8 rounded-2xl border border-slate-700 shadow-lg relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
-                                        <h4 className="text-emerald-400 font-bold uppercase tracking-widest text-sm mb-3"><i className="fas fa-eye mr-2"></i>Video Task</h4>
-                                        <p className="text-lg text-white font-medium">Think: Why is having paper money easier than bartering goods? What might happen to bills and coins in the future?</p>
-                                    </div>
-                                </div>
-
-                                <div className="order-1 lg:order-2 slide-up delay-1">
-                                    <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-2">Phase 4: Class Discussion</h4>
-                                    <h2 className="text-4xl font-display font-black mb-6 text-white">How will we pay?</h2>
-                                    
-                                    <p className="text-slate-300 text-lg mb-8">
-                                        Discuss the advantages and disadvantages of these payment methods. Which do teenagers in your country usually use?
-                                    </p>
-
-                                    <div className="flex flex-wrap gap-3 mb-10">
-                                        <span className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg font-medium text-slate-200"><i className="fas fa-coins text-yellow-500 mr-2"></i>Coins & Bills</span>
-                                        <span className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg font-medium text-slate-200"><i className="fas fa-credit-card text-blue-400 mr-2"></i>Debit Card</span>
-                                        <span className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg font-medium text-slate-200"><i className="fas fa-mobile-alt text-purple-400 mr-2"></i>Cell Phone</span>
-                                        <span className="px-4 py-2 bg-slate-800 border border-emerald-600/50 rounded-lg font-medium text-emerald-300"><i className="fas fa-microchip mr-2"></i>Microchip under skin</span>
-                                    </div>
-
-                                    <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 p-8 rounded-3xl border border-indigo-500/30">
-                                        <h4 className="text-indigo-300 font-bold uppercase tracking-widest text-sm mb-4"><i className="fas fa-comments mr-2"></i>Strategy: Disagreeing Politely</h4>
-                                        <ul className="space-y-4 font-medium text-slate-200">
-                                            <li className="flex items-start"><span className="text-emerald-400 font-bold mr-3">✓</span> "I hear what you're saying, but..."</li>
-                                            <li className="flex items-start"><span className="text-emerald-400 font-bold mr-3">✓</span> "I understand where you're coming from, but..."</li>
-                                            <li className="flex items-start"><span className="text-emerald-400 font-bold mr-3">✓</span> "That's a good point, but the way I see it..."</li>
-                                        </ul>
-                                    </div>
-                                    
-                                    <div className="mt-10 text-right">
-                                        <button 
-                                            onClick={() => setStage(0)}
-                                            className="text-slate-300 hover:text-white transition-colors uppercase tracking-widest text-sm font-bold border border-slate-600 hover:border-slate-400 px-6 py-3 rounded-full"
-                                        >
-                                            Open Student Book Pg 14
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-        };
-
-        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
