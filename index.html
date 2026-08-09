@@ -211,6 +211,7 @@
             const [stage, setStage] = useState(0); 
             const [revealed, setRevealed] = useState(false);
             const [barterAnswers, setBarterAnswers] = useState({});
+            const [triviaAnswers, setTriviaAnswers] = useState({});
 
             const nextStage = () => {
                 setStage(stage + 1);
@@ -246,11 +247,99 @@
             }
 
             if (stage === 1) {
+                const handleTrivia = (qId, idx) => {
+                    if (triviaAnswers[qId] !== undefined) return;
+                    setTriviaAnswers({...triviaAnswers, [qId]: idx});
+                };
+
+                const triviaQuestions = [
+                    { id: 1, q: "What is US 'paper' money actually made of?", opts: ["Tree wood", "Cotton and linen", "Recycled plastic"], ans: 1, fact: "Surprise! US bills are 75% cotton and 25% linen. That's why they don't easily fall apart in the washing machine!" },
+                    { id: 2, q: "Which of these is printed MORE every year?", opts: ["Monopoly game money", "Real US Dollars", "Euro Banknotes"], ans: 0, fact: "Parker Brothers prints about $30 billion in Monopoly money each year, far more than the US mint prints in real currency!" },
+                    { id: 3, q: "Where was the very first paper money invented?", opts: ["Ancient Egypt", "The Roman Empire", "China"], ans: 2, fact: "Paper money was first developed in China during the Tang Dynasty (around 740 AD) to avoid carrying heavy metal coins." }
+                ];
+
+                return (
+                    <div className="min-h-screen p-6 md:p-12 pb-24 flex flex-col justify-center">
+                        <div className="max-w-6xl mx-auto w-full fade-in">
+                            <header className="text-center mb-12 border-b border-slate-800 pb-8">
+                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-3">Phase 1: Money Trivia</h4>
+                                <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">Fact or Fiction?</h2>
+                                <p className="text-slate-300 text-lg max-w-2xl mx-auto">
+                                    Before we talk about the value of money, let's see how much you actually know about it! Guess the answers below.
+                                </p>
+                            </header>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-up">
+                                {triviaQuestions.map((q) => (
+                                    <div key={q.id} className="bg-slate-900/90 border border-slate-700 p-6 rounded-3xl shadow-xl flex flex-col hover:border-emerald-500/30 transition-colors">
+                                        <div className="w-12 h-12 bg-emerald-900/50 rounded-full flex items-center justify-center mb-4 text-emerald-400 text-xl border border-emerald-500/30">
+                                            <i className="fas fa-question"></i>
+                                        </div>
+                                        <p className="text-lg text-white font-medium mb-6 flex-grow">{q.q}</p>
+                                        <div className="space-y-3 mb-6">
+                                            {q.opts.map((opt, optIdx) => {
+                                                const isSelected = triviaAnswers[q.id] === optIdx;
+                                                const isAnswered = triviaAnswers[q.id] !== undefined;
+                                                const isCorrect = optIdx === q.ans;
+                                                
+                                                let btnClass = "w-full text-left p-4 rounded-xl font-bold border transition-all text-sm ";
+                                                
+                                                if (!isAnswered) {
+                                                    btnClass += "bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700 hover:border-emerald-500/50";
+                                                } else {
+                                                    if (isCorrect) btnClass += "bg-emerald-600 border-emerald-400 text-white shadow-[0_0_15px_rgba(52,211,153,0.3)]";
+                                                    else if (isSelected) btnClass += "bg-red-900/50 border-red-500 text-red-200 opacity-70";
+                                                    else btnClass += "bg-slate-800 border-slate-700 text-slate-500 opacity-50";
+                                                }
+
+                                                return (
+                                                    <button 
+                                                        key={optIdx}
+                                                        onClick={() => handleTrivia(q.id, optIdx)}
+                                                        disabled={isAnswered}
+                                                        className={btnClass}
+                                                    >
+                                                        {opt}
+                                                        {isAnswered && isCorrect && <i className="fas fa-check float-right mt-1 text-emerald-200"></i>}
+                                                        {isAnswered && isSelected && !isCorrect && <i className="fas fa-times float-right mt-1 text-red-300"></i>}
+                                                    </button>
+                                                )
+                                            })}
+                                        </div>
+                                        
+                                        {triviaAnswers[q.id] !== undefined && (
+                                            <div className="mt-auto animate-fade-in bg-slate-950 p-4 rounded-xl border-l-4 border-emerald-500">
+                                                <p className="text-sm text-slate-300"><span className="text-emerald-400 font-bold">Fun Fact:</span> {q.fact}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-12 text-center slide-up delay-2">
+                                <button 
+                                    onClick={nextStage}
+                                    disabled={Object.keys(triviaAnswers).length < 3}
+                                    className={`px-12 py-4 rounded-full font-bold text-lg transition-all transform ${
+                                        Object.keys(triviaAnswers).length === 3
+                                        ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] hover:scale-105'
+                                        : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                                    }`}
+                                >
+                                    Continue to Phase 2 <i className="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (stage === 2) {
                 return (
                     <div className="min-h-screen p-6 md:p-12 pb-24 flex items-center justify-center">
                         <div className="max-w-5xl mx-auto w-full fade-in">
                             <header className="text-center mb-12 border-b border-slate-800 pb-8">
-                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-3">Phase 1: The Value Test</h4>
+                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-3">Phase 2: The Value Test</h4>
                                 <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">Trash or Treasure?</h2>
                                 <p className="text-slate-300 text-lg max-w-2xl mx-auto">
                                     Scratch off the protective coating below to uncover the true auction prices of these unique collectibles!
@@ -297,7 +386,7 @@
                                             onClick={nextStage}
                                             className="bg-indigo-600 hover:bg-indigo-500 text-white px-12 py-4 rounded-full font-bold text-lg shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all transform hover:scale-105"
                                         >
-                                            Continue to Phase 2 <i className="fas fa-arrow-right ml-2"></i>
+                                            Continue to Phase 3 <i className="fas fa-arrow-right ml-2"></i>
                                         </button>
                                     </div>
                                 )}
@@ -307,7 +396,7 @@
                 );
             }
 
-            if (stage === 2) {
+            if (stage === 3) {
                 const handleBarterClick = (q, answer) => {
                     setBarterAnswers({...barterAnswers, [q]: answer});
                 }
@@ -316,7 +405,7 @@
                     <div className="min-h-screen p-6 md:p-12 pb-24 flex items-center">
                         <div className="max-w-6xl mx-auto w-full fade-in">
                             <header className="mb-10 text-center">
-                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-2">Phase 2: Money Matters</h4>
+                                <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-2">Phase 3: Money Matters</h4>
                                 <h2 className="text-4xl font-display font-black text-white">Life Without Currency</h2>
                                 <p className="text-slate-300 mt-4 text-lg">If bills and coins disappeared, how would we survive? Choose the correct vocabulary word.</p>
                             </header>
@@ -385,7 +474,7 @@
                                         : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                                     }`}
                                 >
-                                    Continue to Factflix Prep <i className="fas fa-arrow-right ml-2"></i>
+                                    Continue to Phase 4 <i className="fas fa-arrow-right ml-2"></i>
                                 </button>
                             </div>
                         </div>
@@ -393,7 +482,7 @@
                 );
             }
 
-            if (stage === 3) {
+            if (stage === 4) {
                 return (
                     <div className="min-h-screen p-6 md:p-12 flex items-center">
                         <div className="max-w-6xl mx-auto w-full fade-in">
@@ -414,7 +503,7 @@
                                 </div>
 
                                 <div className="order-1 lg:order-2 slide-up delay-1">
-                                    <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-2">Phase 3: Class Discussion</h4>
+                                    <h4 className="text-emerald-500 font-bold tracking-[0.2em] uppercase mb-2">Phase 4: Class Discussion</h4>
                                     <h2 className="text-4xl font-display font-black mb-6 text-white">How will we pay?</h2>
                                     
                                     <p className="text-slate-300 text-lg mb-8">
