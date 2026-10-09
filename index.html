@@ -176,6 +176,7 @@
             <div class="text-center mb-8">
                 <h3 class="text-3xl font-bold text-emerald-400 mb-2">The Great Barter Hustle</h3>
                 <p class="text-slate-300 text-lg">Can you swap something you have for something you need?</p>
+                <p class="mt-3 text-amber-200">Lesson 2: vocabulary first (20 minutes), then Barter Hustle (20 minutes). Prepare 5 · trade 6 · reflect 7 · exit check 2.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -212,7 +213,8 @@
                     </div>
                     <div class="mt-5 flex flex-wrap gap-3">
                         <a class="resource-link" href="resources/Barter_Hustle_24_Cards.pdf" target="_blank" rel="noopener">Print 24 cards · 6 pages</a>
-                        <a class="resource-link" href="resources/Unit_2_Introduction_Lesson_Plan.docx" download>Teacher lesson plan</a>
+                        <a class="resource-link" href="resources/Unit_2_Lesson_2_Vocabulary_and_Bartering.docx" download>Lesson 2 vocabulary + bartering plan</a>
+                        <a class="resource-link" href="https://github.com/sinanseden-eng/unit2-vocabulary" target="_blank" rel="noopener">Vocabulary presentation project</a>
                     </div>
                 </div>
 
@@ -224,7 +226,7 @@
                     
                     <h4 class="text-emerald-500 font-bold tracking-widest uppercase mb-4">Market Closes In</h4>
                     <div id="timer-display" class="text-7xl md:text-8xl font-black text-white font-mono tracking-tight mb-8 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                        3:00
+                        6:00
                     </div>
                     
                     <div class="flex gap-4">
@@ -382,8 +384,8 @@
 
         // Timer Logic
         let timerInterval;
-        let timeLeft = 180; // 3 minutes in seconds
-        const initialTime = 180;
+        let timeLeft = 360; // 6 minutes in seconds
+        const initialTime = 360;
 
         function updateTimerDisplay() {
             const minutes = Math.floor(timeLeft / 60);
