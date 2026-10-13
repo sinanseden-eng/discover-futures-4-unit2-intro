@@ -55,7 +55,7 @@
         <div id="phase-1" class="phase-content glass-panel rounded-2xl p-8 max-w-4xl mx-auto w-full">
             <div class="text-center mb-8">
                 <h3 class="text-3xl font-bold text-white mb-2">Money Trivia</h3>
-                <p class="text-slate-400">Can you guess the right answers before we start the unit?</p>
+                <p class="text-slate-400">Discuss each question with a partner and choose an answer. Be ready to explain your choice.</p>
             </div>
 
             <div class="space-y-6">
@@ -63,12 +63,9 @@
                 <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
                     <p class="text-xl font-semibold mb-4">1. What are U.S. paper bills mostly made of?</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <button onclick="checkTrivia(1, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) Paper from trees</button>
-                        <button onclick="checkTrivia(1, true, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) Cotton & Linen</button>
-                        <button onclick="checkTrivia(1, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">C) Synthetic Plastic</button>
-                    </div>
-                    <div id="trivia-fact-1" class="hidden mt-4 p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg text-emerald-300">
-                        <i class="fas fa-info-circle mr-2"></i><strong>Correct!</strong> U.S. currency is actually a blend of 75% cotton and 25% linen. That's why it survives going through the washing machine!
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) Paper from trees</button>
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) Cotton & Linen</button>
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">C) Synthetic Plastic</button>
                     </div>
                 </div>
 
@@ -76,11 +73,8 @@
                 <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
                     <p class="text-xl font-semibold mb-4">2. Who prints more money annually?</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <button onclick="checkTrivia(2, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) The United States Mint</button>
-                        <button onclick="checkTrivia(2, true, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) The makers of Monopoly</button>
-                    </div>
-                    <div id="trivia-fact-2" class="hidden mt-4 p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg text-emerald-300">
-                        <i class="fas fa-info-circle mr-2"></i><strong>Correct!</strong> Parker Brothers prints about $30 billion in Monopoly money every year, which is way more than the US Mint prints in real money.
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) The United States Mint</button>
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) The makers of Monopoly</button>
                     </div>
                 </div>
 
@@ -88,12 +82,9 @@
                 <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
                     <p class="text-xl font-semibold mb-4">3. Where was paper money first invented?</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <button onclick="checkTrivia(3, true, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) China</button>
-                        <button onclick="checkTrivia(3, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) Ancient Greece</button>
-                        <button onclick="checkTrivia(3, false, this)" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">C) The Roman Empire</button>
-                    </div>
-                    <div id="trivia-fact-3" class="hidden mt-4 p-4 bg-emerald-900/30 border border-emerald-800 rounded-lg text-emerald-300">
-                        <i class="fas fa-info-circle mr-2"></i><strong>Correct!</strong> The first paper money was created in China during the Tang Dynasty (7th century) because heavy copper coins were too difficult for merchants to carry.
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">A) China</button>
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">B) Ancient Greece</button>
+                        <button onclick="chooseTrivia(this)" aria-pressed="false" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition">C) The Roman Empire</button>
                     </div>
                 </div>
             </div>
@@ -176,6 +167,7 @@
             <div class="text-center mb-8">
                 <h3 class="text-3xl font-bold text-emerald-400 mb-2">The Great Barter Hustle</h3>
                 <p class="text-slate-300 text-lg">Can you swap something you have for something you need?</p>
+                <p class="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-5 py-3 font-bold text-amber-200">This activity will take place in the next lesson. Today, focus on the introduction activities.</p>
                 <p class="mt-3 text-amber-200">Lesson 2: vocabulary first (20 minutes), then Barter Hustle (20 minutes). Prepare 5 · trade 6 · reflect 7 · exit check 2.</p>
             </div>
 
@@ -307,32 +299,16 @@
             }
         }
 
-        // Trivia Logic
-        function checkTrivia(qNum, isCorrect, btnElement) {
-            const siblings = btnElement.parentElement.children;
-            for(let i=0; i<siblings.length; i++) {
-                siblings[i].disabled = true;
-                siblings[i].classList.remove('bg-slate-700', 'hover:bg-slate-600');
-                siblings[i].classList.add('bg-slate-800', 'text-slate-500', 'cursor-not-allowed');
+        // Students can select an answer without receiving the key.
+        function chooseTrivia(button) {
+            for (const option of button.parentElement.querySelectorAll('button')) {
+                option.classList.remove('bg-emerald-600', 'text-white', 'ring-2', 'ring-emerald-300');
+                option.classList.add('bg-slate-700', 'hover:bg-slate-600');
+                option.setAttribute('aria-pressed', 'false');
             }
-            
-            if(isCorrect) {
-                btnElement.classList.remove('bg-slate-800', 'text-slate-500');
-                btnElement.classList.add('bg-emerald-600', 'text-white', 'border-2', 'border-emerald-400');
-                document.getElementById('trivia-fact-' + qNum).classList.remove('hidden');
-            } else {
-                btnElement.classList.remove('bg-slate-800', 'text-slate-500');
-                btnElement.classList.add('bg-red-600', 'text-white');
-                
-                // Highlight correct answer
-                for(let i=0; i<siblings.length; i++) {
-                    if(siblings[i].getAttribute('onclick').includes('true')) {
-                        siblings[i].classList.remove('bg-slate-800', 'text-slate-500');
-                        siblings[i].classList.add('bg-emerald-600', 'text-white');
-                    }
-                }
-                document.getElementById('trivia-fact-' + qNum).classList.remove('hidden');
-            }
+            button.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+            button.classList.add('bg-emerald-600', 'text-white', 'ring-2', 'ring-emerald-300');
+            button.setAttribute('aria-pressed', 'true');
         }
 
         // Scratch Card Logic
